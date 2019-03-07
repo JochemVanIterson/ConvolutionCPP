@@ -18,7 +18,7 @@ public:
   void printFileInfo();
   int getSampleRate();
   AudioFile<double>::AudioBuffer getBuffer(); // Actually AudioBuffer is just a vector of vectors
-  void fillBuffer(jack_default_audio_sample_t *outBuf, jack_nframes_t nframes);
+  void fillBuffer(std::vector<jack_default_audio_sample_t*> outputBuffers, jack_nframes_t nframes, bool overwrite);
 
   // ------------------------- Getters and setters -------------------------- //
   void setIsPlaying(bool isPlaying);

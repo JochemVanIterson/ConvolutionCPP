@@ -13,7 +13,7 @@ _OBJS = \
 	main.o \
 	AudioFile/AudioFile.o \
 	FilePlayback/FilePlayback.o \
-	jack/jack_module.o \
+	jack_mc/jack_module_mc.o \
 
 OBJS = $(patsubst %,$(ODIR)/%,$(_OBJS))
 

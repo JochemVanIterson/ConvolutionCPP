@@ -3,7 +3,7 @@
 #include <getopt.h>
 
 #include "FilePlayback/FilePlayback.h"
-#include "jack/jack_module.h"
+#include "jack_mc/jack_module_mc.h"
 
 std::string filename = "";
 bool verbose = false; // use if(verbose) for verbose logging
@@ -80,7 +80,7 @@ int main(int argc, char *argv[]){
   FilePlayback filePlayback(filename.c_str());
   if(verbose)filePlayback.printFileInfo();
 
-  JackModule jack; // create a JackModule instance
+  JackModuleMC jack(2,1); // create a JackModuleMC instance
   jack.init(argv[0]); // init the jack, use program name as JACK client name
   double samplerate = jack.getSamplerate();
 
@@ -88,8 +88,8 @@ int main(int argc, char *argv[]){
     std::cout << "Samplerates don't match. Using jack Samplerate" << std::endl;
   }
 
-  jack.onProcess = [&filePlayback](jack_default_audio_sample_t *inBuf, jack_default_audio_sample_t *outBuf, jack_nframes_t nframes) {
-    filePlayback.fillBuffer(outBuf, nframes);
+  jack.onProcess = [&filePlayback](std::vector<jack_default_audio_sample_t*> inputBuffers, std::vector<jack_default_audio_sample_t*> outputBuffers, jack_nframes_t nframes) {
+    filePlayback.fillBuffer(outputBuffers, nframes, true);
     return 0;
   };
   jack.autoConnect();
