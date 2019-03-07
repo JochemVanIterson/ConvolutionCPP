@@ -101,10 +101,7 @@ void JackModuleMC::autoConnect(){
   }
 
   for(unsigned int walker = 0; walker<outputCount; walker++){
-    if(jack_connect(client,jack_port_name(outputPorts[walker]),ports[0])){
-      std::cout << "Cannot connect output ports" << std::endl;
-    }
-    if(jack_connect(client,jack_port_name(outputPorts[walker]),ports[1])){
+    if(jack_connect(client,jack_port_name(outputPorts[walker]),ports[walker])){
       std::cout << "Cannot connect output ports" << std::endl;
     }
   }
