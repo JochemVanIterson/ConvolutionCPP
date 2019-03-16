@@ -14,13 +14,17 @@ void DirectConvolution::setImpulseResponse(std::string file) {
     std::cout << "Impulse file appears to be larger than 1500 samples.\nOnly the first 1500 samples will be used" << '\n';
     size = 1500/IR_Buf.getNumChannels();
   }
+  double baseline = sqrt(1/(double)size);
+  if(verbose)std::cout << "baseline: " << baseline << '\n';
+
   double totalAmound = 0;
   for(int walker = 0; walker<size; walker++){
-    totalAmound+=IR_Buf.atIndex(0, walker);
+    totalAmound+=pow(IR_Buf.atIndex(0, walker), 2);
   }
-  std::cout << "totalAmound: " << totalAmound << '\n';
-  normAmount = 1/totalAmound;
-  std::cout << "normAmount: " << normAmount << '\n';
+  double rms = sqrt(totalAmound/(double)size);
+
+  normAmount = baseline/rms;
+  if(verbose)std::cout << "normAmount: " << normAmount << '\n';
   inputBuf = new CircularBuffer<double>(size);
 }
 
