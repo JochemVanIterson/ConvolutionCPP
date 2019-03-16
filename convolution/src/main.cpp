@@ -1,5 +1,5 @@
 // USAGE:
-// ./bin/Test --file <file> --impulse <file>
+// ./build/convolution --help
 
 #include <getopt.h>
 #include <iostream>
@@ -15,6 +15,7 @@ std::vector<std::string> modes {"direct_mic", "direct_file", "impulse_mic", "imp
 std::string mode = "";
 std::string filename = "";
 std::string impulseFile = "";
+int jackOutputs = 2;
 bool loadFile = false;
 bool loadImpulse = false;
 bool verbose = false; // use if(verbose) for verbose logging
@@ -31,12 +32,13 @@ void getArguments(int *argc, char **argv[]){
       {"file",     required_argument, 0,  'f' },
       {"impulse",  required_argument, 0,  'i' },
       {"mode",     required_argument, 0,  'm' },
+      {"outputs",  required_argument, 0,  'o' },
       {"verbose",  no_argument,       0,  1 },
       {"help",     no_argument,       0,  'h' },
       {0,          0,                 0,  0 }
     };
 
-    c = getopt_long((*argc), (*argv), "hf:i:m:01", long_options, &option_index);
+    c = getopt_long((*argc), (*argv), "hf:i:m:o:01", long_options, &option_index);
     if (c == -1)
       break;
 
@@ -53,6 +55,9 @@ void getArguments(int *argc, char **argv[]){
         break;
       case 'i':
         impulseFile = optarg;
+        break;
+      case 'o':
+        jackOutputs = std::atoi (optarg);
         break;
       case 'm':
         mode = optarg;
@@ -119,8 +124,13 @@ int main(int argc, char** argv) {
   getArguments(&argc, &argv);
   if(verbose)std::cout << "Mode: " << mode << '\n';
 
+  if(mode==""){
+    std::cout << "No mode was provided\nUse --help for more information" << '\n';
+    exit(EXIT_FAILURE);
+  }
+
   FilePlayback filePlayback;
-  DirectConvolution convolution;  //Create DirectConvolution instance.
+  DirectConvolution convolution(verbose);  //Create DirectConvolution instance.
 
   if(loadImpulse){
     if(impulseFile==""){
@@ -141,9 +151,13 @@ int main(int argc, char** argv) {
 
   setupDone = true;
 
-  JackModule jack(2,2); //Create jackmodule.
+  JackModule jack(jackOutputs,2); //Create jackmodule.
   jack.init(argv[0]);
-  jack.onProcess = [&convolution, &filePlayback](std::vector<jack_default_audio_sample_t*> *inputBuffers, std::vector<jack_default_audio_sample_t*> *outputBuffers, jack_nframes_t nframes){
+  jack.onProcess = [&convolution, &filePlayback](
+    std::vector<jack_default_audio_sample_t*> *inputBuffers,
+    std::vector<jack_default_audio_sample_t*> *outputBuffers,
+    jack_nframes_t nframes
+  ){
     // --------------------------- Direct Mic out --------------------------- //
     if(mode == "direct_mic"){
       for(int channels = 0; channels<outputBuffers->size();channels++){
@@ -174,8 +188,7 @@ int main(int argc, char** argv) {
     return 1;
   };
   jack.autoConnect();
-
-  convolution.start();
+  if(loadImpulse) convolution.start();
 
   //Keep jack running.
   bool running = true;
@@ -185,7 +198,7 @@ int main(int argc, char** argv) {
     std::system("stty cooked");
 
     if(input == 'q') {
-      std::cout << "STOPPING PROCESS..." << '\n';
+      if(verbose)std::cout << "STOPPING PROCESS..." << '\n';
       running = false;
       filePlayback.stop();
       convolution.stop();
@@ -197,6 +210,6 @@ int main(int argc, char** argv) {
       }
     }
   }
-  std::cout << "PROCESS STOPPED" << '\n';
+  if(verbose)std::cout << "PROCESS STOPPED" << '\n';
   return 0;
 }

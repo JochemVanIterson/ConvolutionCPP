@@ -9,12 +9,14 @@
 class Convolution {
 protected:
   Convolution();
+  Convolution(bool verbose);
   virtual ~Convolution();
   bool active = false;
   std::queue<double> inQueue;
   std::queue<double> outQueue;
   bool inQueueLock = false;
   bool outQueueLock = false;
+  bool verbose = false;
 
 public:
   void pushInput(std::vector<jack_default_audio_sample_t*> *inputBuffers, jack_nframes_t nframes);

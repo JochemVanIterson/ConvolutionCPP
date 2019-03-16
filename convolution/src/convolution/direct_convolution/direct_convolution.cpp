@@ -2,7 +2,8 @@
 #include <math.h>
 #include "direct_convolution.h"
 
-DirectConvolution::DirectConvolution() {}
+DirectConvolution::DirectConvolution():Convolution() {}
+DirectConvolution::DirectConvolution(bool verbose):Convolution(verbose) {}
 
 DirectConvolution::~DirectConvolution() {}
 
@@ -10,7 +11,7 @@ void DirectConvolution::setImpulseResponse(std::string file) {
   IR_Buf.openFile(file);
   int size = IR_Buf.size();
   if(size*IR_Buf.getNumChannels()>1500){
-    std::cout << "Impulse file is larger than 1500 samples.\nOnly the first 1500 samples will be used" << '\n';
+    std::cout << "Impulse file appears to be larger than 1500 samples.\nOnly the first 1500 samples will be used" << '\n';
     size = 1500/IR_Buf.getNumChannels();
   }
   double totalAmound = 0;
@@ -24,11 +25,10 @@ void DirectConvolution::setImpulseResponse(std::string file) {
 }
 
 void DirectConvolution::convolute() {
-  std::cout << "THREAD STARTED......." << '\n';
+  if(verbose)std::cout << "THREAD STARTED......." << '\n';
   int begin = 0;
   int end = 0;
   const int numChannels = IR_Buf.getNumChannels();
-  std::cout << "numChannels: " << numChannels << '\n';
   while(active) {
     if(inQueue.size()>0 && !inQueueLock && !outQueueLock) {
       setOutQueueLock(true);
@@ -44,13 +44,11 @@ void DirectConvolution::convolute() {
       setInQueueLock(false);
     }
   }
-  std::cout << "while(active) false" << '\n';
-  std::cout << "begin: " << begin << "\tend: " << end << '\n';
   while(begin < inputBuf->size()) {
     calcSamples(&begin, &end, numChannels);
     begin++;
   }
-  std::cout << "THREAD STOPPED......." << '\n';
+  if(verbose)std::cout << "THREAD STOPPED......." << '\n';
 }
 
 void DirectConvolution::calcSamples(int *begin, int *end, const int numChannels) {

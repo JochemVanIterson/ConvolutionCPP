@@ -11,6 +11,7 @@
 class DirectConvolution : public Convolution {
 public:
   DirectConvolution();
+  DirectConvolution(bool verbose);
   ~DirectConvolution();
 
   void setImpulseResponse(std::string file) override;

@@ -4,6 +4,9 @@
 #include "convolution.h"
 
 Convolution::Convolution() {}
+Convolution::Convolution(bool verbose) {
+  this->verbose = verbose;
+}
 
 Convolution::~Convolution() {}
 
@@ -45,7 +48,6 @@ void Convolution::start() {
 
 void Convolution::stop() {
   if(active){
-    std::cout << "Stopping thread" << std::endl;
     active = false;
     calcThread.join();
   } else {
