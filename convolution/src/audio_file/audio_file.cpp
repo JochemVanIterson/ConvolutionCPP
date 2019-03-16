@@ -280,7 +280,7 @@ template <class T> bool AudioFile<T>::decodeWaveFile (std::vector<uint8_t>& file
     std::cout << "ERROR: this WAV file seems to be neither mono nor stereo (perhaps multi-track, or corrupted?)" << std::endl;
     return false;
   }
-  else {
+  else if (numChannels > 2){
     std::cout << "This WAV file seems to be multi-track" << std::endl;
   }
 
