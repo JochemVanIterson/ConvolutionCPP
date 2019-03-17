@@ -94,7 +94,7 @@ void getArguments(int *argc, char **argv[]){
         std::cout << "   Make sure you're using headphones\n";
         std::cout << "direct_file:\n";
         std::cout << "   Writes the file input directly to the output\n";
-        std::cout << "direct_file:\n";
+        std::cout << "impulse_file:\n";
         std::cout << "   Convolves the file input\n";
 
         exit(EXIT_SUCCESS);
