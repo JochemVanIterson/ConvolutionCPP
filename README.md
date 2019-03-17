@@ -9,4 +9,10 @@ For this course we will build three applications which implement convolution. Al
 
 ## Status
 - [x] Week 1: Pitch the idea (pitch 1)
-- [ ] Week 2: Pitch what we are trying to accomplish, now with research (pitch 2)
+- [x] Week 2: Pitch what we are trying to accomplish, now with research (pitch 2)
+
+## TODO
+- implement mp3 files into convolution
+
+# Install
+[INSTALL.md](/INSTALL.md)
