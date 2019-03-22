@@ -7,7 +7,6 @@ class FilePlayback {
 public:
   // ---------------------- Constructor and Destructor ---------------------- //
   FilePlayback();
-  FilePlayback(std::string file);
   ~FilePlayback();
 
   // ----------------------------- Play actions ----------------------------- //
@@ -19,7 +18,7 @@ public:
   void openFile(std::string file);
   void printFileInfo();
   int getSampleRate();
-  AudioFile<double>::AudioBuffer getBuffer(); // Actually AudioBuffer is just a vector of vectors
+  AudioFile::AudioBuffer getBuffer(); // Actually AudioBuffer is just a vector of vectors
   void fillBuffer(std::vector<jack_default_audio_sample_t*> *outputBuffers, jack_nframes_t nframes, bool overwrite);
 
   // ------------------------- Getters and setters -------------------------- //
@@ -31,7 +30,7 @@ public:
 private:
   // ------------------------------ AudioFile ------------------------------- //
   std::string file;
-  AudioFile<double> audioFile;
+  AudioFile *audioFile;
   long filesize = 0;
   int numChannels = 0;
 

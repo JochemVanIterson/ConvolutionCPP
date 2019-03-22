@@ -1,6 +1,8 @@
 
 #include "audio_buffer.h"
 #include "../audio_file/audio_file.h"
+#include "../audio_file/wavaiff/AudioFileWav.h"
+#include "../audio_file/mp3/AudioFileMp3.h"
 
 #include <iostream>
 #include <fstream>
@@ -12,21 +14,30 @@ AudioBuffer::~AudioBuffer() {
 }
 
 void AudioBuffer::openFile(std::string file) {
-  AudioFile<double> audioImport;
+  AudioFile* audioImport = nullptr;
   this->file = file;
   if(!checkFileExists()) {
     std::cout << "Error: File doesn't exist" << std::endl;
     return;
   }
 
-  audioImport.load(file);
-  numChannels = audioImport.getNumChannels();
-  bufSize = audioImport.getNumSamplesPerChannel();
+  AudioFileFormat format = AudioFile::getAudioFormat(file);
+  if(format == AudioFileFormat::Mp3)audioImport = new AudioFileMp3();
+  else if(format == AudioFileFormat::Wave)audioImport = new AudioFileWav();
+  else if(format == AudioFileFormat::Aiff)audioImport = new AudioFileWav();
+  else {
+    std::cout << "Impulse file wasn't an audio file.\nExit program" << '\n';
+    exit(EXIT_FAILURE);
+  }
+
+  audioImport->load(file);
+  numChannels = audioImport->getNumChannels();
+  bufSize = audioImport->getNumSamplesPerChannel();
   absBufSize = bufSize * numChannels;
   data = new double[absBufSize];
   for(unsigned int i = 0; i < bufSize; i++) {
     for(unsigned int channel = 0; channel < numChannels; channel++) {
-      data[i * numChannels + channel] = audioImport.samples[channel][i];
+      data[i * numChannels + channel] = audioImport->samples[channel][i];
     }
   }
 }

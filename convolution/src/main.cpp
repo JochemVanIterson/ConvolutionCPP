@@ -93,13 +93,13 @@ void getArguments(int *argc, char **argv[]){
         std::cout << "impulse_mic:\n";
         std::cout << "   Convolves the microphone input\n";
         std::cout << "   Make sure you're using headphones\n";
-        std::cout << "   Requires [-i | --impulse <filepath>]\n"
+        std::cout << "   Requires [-i | --impulse <filepath>]\n";
         std::cout << "direct_file:\n";
         std::cout << "   Writes the file input directly to the output\n";
-        std::cout << "   Requires [-f | --file <filepath>]\n"
+        std::cout << "   Requires [-f | --file <filepath>]\n";
         std::cout << "impulse_file:\n";
         std::cout << "   Convolves the file input\n";
-        std::cout << "   Requires [-f | --file <filepath>] and [-i | --impulse <filepath>]\n"
+        std::cout << "   Requires [-f | --file <filepath>] and [-i | --impulse <filepath>]\n";
 
         exit(EXIT_SUCCESS);
         break;

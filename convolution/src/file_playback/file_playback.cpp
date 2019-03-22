@@ -1,4 +1,6 @@
 #include "file_playback.h"
+#include "../audio_file/wavaiff/AudioFileWav.h"
+#include "../audio_file/mp3/AudioFileMp3.h"
 
 #include <iostream>
 #include <fstream>
@@ -6,10 +8,6 @@
 // --------------------------------- PUBLIC --------------------------------- //
 // ----------------------- Constructor and Destructor ----------------------- //
 FilePlayback::FilePlayback(){}
-FilePlayback::FilePlayback(std::string file){
-  FilePlayback();
-  openFile(file);
-}
 FilePlayback::~FilePlayback(){}
 
 // ------------------------------ Play actions ------------------------------ //
@@ -31,26 +29,32 @@ void FilePlayback::openFile(std::string file){
     std::cout << "Error: File doesn't exist" <<  std::endl;
     return;
   }
-  audioFile.load(file);
-  filesize = audioFile.getNumSamplesPerChannel();
-  numChannels = audioFile.getNumChannels();
+
+  AudioFileFormat format = AudioFile::getAudioFormat(file);
+  if(format == AudioFileFormat::Mp3)audioFile = new AudioFileMp3();
+  else if(format == AudioFileFormat::Wave)audioFile = new AudioFileWav();
+  else if(format == AudioFileFormat::Aiff)audioFile = new AudioFileWav();
+
+  audioFile->load(file);
+  filesize = audioFile->getNumSamplesPerChannel();
+  numChannels = audioFile->getNumChannels();
 }
 void FilePlayback::printFileInfo(){
   if(checkFileExists())
-  audioFile.printSummary();
+  audioFile->printSummary();
 }
 int FilePlayback::getSampleRate(){
-  return audioFile.getSampleRate();
+  return audioFile->getSampleRate();
 }
-AudioFile<double>::AudioBuffer FilePlayback::getBuffer(){
-  return audioFile.samples;
+AudioFile::AudioBuffer FilePlayback::getBuffer(){
+  return audioFile->samples;
 }
 void FilePlayback::fillBuffer(std::vector<jack_default_audio_sample_t*> *outputBuffers, jack_nframes_t nframes, bool overwrite){
   for(unsigned int i = 0; i < nframes; i++) {
     for(int channel = 0; channel<numChannels && channel<outputBuffers->size(); channel++){
       if(isPlaying && playHead<filesize){
         if(overwrite)(*outputBuffers)[channel][i] = 0;
-        (*outputBuffers)[channel][i] += audioFile.samples[channel][playHead];
+        (*outputBuffers)[channel][i] += audioFile->samples[channel][playHead];
       } else if(!isPlaying){
         if(overwrite)(*outputBuffers)[channel][i] = 0;
       } else if(playHead>=filesize){

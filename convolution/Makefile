@@ -2,7 +2,7 @@ OUTDIR  = build/
 OUT     = $(OUTDIR)convolution
 CXX     = g++
 CFLAGS  := -Wall -std=c++17
-LDFLAGS = -ljack
+LDFLAGS = -ljack -lmpg123
 ODIR    = $(OUTDIR)obj
 SDIR    = src
 INC     = -Iinc
@@ -12,6 +12,8 @@ all: $(OUT)
 _OBJS = \
 	audio_buffer/audio_buffer.o \
 	audio_file/audio_file.o \
+	audio_file/wavaiff/AudioFileWav.o \
+	audio_file/mp3/AudioFileMp3.o \
 	convolution/convolution.o \
 	convolution/direct_convolution/direct_convolution.o \
 	file_playback/file_playback.o \
